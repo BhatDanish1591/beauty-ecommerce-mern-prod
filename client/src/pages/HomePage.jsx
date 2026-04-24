@@ -112,27 +112,17 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Luxury Best Sellers Slider */}
-      <section className="best-sellers-slider-section">
-        <div className="container">
-          <div className="section-header-flex">
-            <div>
-              <h2 className="section-title">Best Sellers</h2>
-              <p>The most coveted beauty essentials of the season</p>
-            </div>
-            <div className="slider-controls">
-              <button onClick={() => scrollSlider('left')} className="control-btn"><ChevronLeft /></button>
-              <button onClick={() => scrollSlider('right')} className="control-btn"><ChevronRight /></button>
-            </div>
-          </div>
-          
-          <div className="slider-container" ref={sliderRef}>
-            {products.slice(0, 8).map((product) => (
-              <motion.div 
-                key={product._id}
-                className="slider-item"
-                whileHover={{ y: -10 }}
-              >
+      {/* Luxury Best Sellers Infinite Marquee */}
+      <section className="best-sellers-marquee-section">
+        <div className="section-header container">
+          <h2 className="section-title">Best Sellers</h2>
+          <p>The most coveted beauty essentials of the season</p>
+        </div>
+        
+        <div className="marquee-wrapper">
+          <div className="marquee-track">
+            {[...products.slice(0, 8), ...products.slice(0, 8)].map((product, index) => (
+              <div key={`${product._id}-${index}`} className="marquee-item">
                 <div className="premium-card">
                   <div className="card-image-wrapper">
                     <div className="best-seller-ribbon">Top Seller</div>
@@ -157,7 +147,7 @@ const HomePage = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
