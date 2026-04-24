@@ -12,7 +12,9 @@ import {
   LogOut,
   Search,
   TrendingUp,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './AdminDashboard.css';
@@ -40,6 +42,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -135,6 +139,13 @@ const AdminDashboard = () => {
     (p.name.toLowerCase().includes(searchTerm.toLowerCase())) && 
     (activeFilter === 'All' || p.category === activeFilter)
   );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeFilter]);
 
   return (
     <div className="admin-container">
@@ -262,7 +273,7 @@ const AdminDashboard = () => {
               <table className="pro-table">
                 <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
                 <tbody>
-                  {filteredProducts.map(product => (
+                  {paginatedProducts.map(product => (
                     <tr key={product._id}>
                       <td><div className="table-product-info"><img src={product.image} /><span>{product.name}</span></div></td>
                       <td><span className="cat-badge">{product.category}</span></td>
@@ -279,6 +290,36 @@ const AdminDashboard = () => {
                 </tbody>
               </table>
             </div>
+
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button 
+                  disabled={currentPage === 1} 
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                  className="page-btn"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <div className="page-numbers">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button 
+                      key={i} 
+                      className={currentPage === i + 1 ? 'page-number active' : 'page-number'}
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  disabled={currentPage === totalPages} 
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  className="page-btn"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
           </div>
         )}
 
