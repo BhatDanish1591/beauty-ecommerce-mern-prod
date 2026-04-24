@@ -16,6 +16,7 @@ import './index.css';
 const AppContent = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   return (
     <>
@@ -33,7 +34,7 @@ const AppContent = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </main>
-      {!isAdminPath && <Footer />}
+      {!isAdminPath && !userInfo && <Footer />}
     </>
   );
 };
