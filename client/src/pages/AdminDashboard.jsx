@@ -37,6 +37,7 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({
     name: '', price: 0, image: '', brand: '', category: 'Makeup', countInStock: 0, description: ''
   });
+  const [loading, setLoading] = useState(true);
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -47,6 +48,7 @@ const AdminDashboard = () => {
 
     const fetchData = async () => {
       try {
+        setLoading(true);
         const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
         const [prodRes, orderRes, userRes] = await Promise.all([
           api.get('/products'),
@@ -58,16 +60,18 @@ const AdminDashboard = () => {
         if (Array.isArray(orderRes.data)) setOrders(orderRes.data);
         if (Array.isArray(userRes.data)) setUsers(userRes.data);
 
-        const totalRevenue = orderRes.data.reduce((acc, order) => acc + order.totalPrice, 0);
+        const totalRevenue = (orderRes.data || []).reduce((acc, order) => acc + (order.totalPrice || 0), 0);
         
         setStats({
-          totalProducts: prodRes.data.length,
-          totalOrders: orderRes.data.length,
-          totalUsers: userRes.data.length,
+          totalProducts: (prodRes.data || []).length,
+          totalOrders: (orderRes.data || []).length,
+          totalUsers: (userRes.data || []).length,
           revenue: totalRevenue
         });
       } catch (error) {
-        console.error('Error fetching admin data');
+        console.error('Error fetching admin data', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -103,16 +107,21 @@ const AdminDashboard = () => {
     e.preventDefault();
     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
     try {
+      const productData = {
+        ...formData,
+        price: Number(formData.price),
+        countInStock: Number(formData.countInStock)
+      };
       if (editMode) {
-        const { data } = await api.put(`/products/${currentId}`, formData, config);
+        const { data } = await api.put(`/products/${currentId}`, productData, config);
         setProducts(products.map(p => p._id === currentId ? data : p));
       } else {
-        const { data } = await api.post('/products', formData, config);
+        const { data } = await api.post('/products', productData, config);
         setProducts([data, ...products]);
       }
       setShowModal(false);
     } catch (error) {
-      alert('Error saving product');
+      alert('Error saving product: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -124,7 +133,7 @@ const AdminDashboard = () => {
   return (
     <div className="admin-container">
       <aside className="admin-sidebar glass">
-        <div className="sidebar-brand">
+        <div className="sidebar-brand" onClick={() => setActiveTab('overview')} style={{ cursor: 'pointer' }}>
           <LayoutDashboard size={24} color="var(--accent)" />
           <span>Admin<span>Panel</span></span>
         </div>
@@ -141,36 +150,128 @@ const AdminDashboard = () => {
 
       <main className="admin-main">
         <header className="admin-header">
-          <h1 style={{ textTransform: 'capitalize' }}>{activeTab}</h1>
+          <h1 className="serif-title" style={{ textTransform: 'capitalize' }}>{activeTab}</h1>
           <div className="header-actions">
-            <div className="admin-search glass">
+            <div className="admin-search-top glass">
               <Search size={18} />
               <input type="text" placeholder={`Search ${activeTab}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
-            {activeTab === 'products' && (
-              <button className="btn-primary" onClick={() => openModal()}><Plus size={18} /> New Product</button>
-            )}
           </div>
         </header>
 
         {activeTab === 'overview' && (
-          <div className="stats-grid fade-in">
-            <div className="stat-card glass">
-              <div className="stat-icon" style={{ background: '#e0f2fe', color: '#0ea5e9' }}><DollarSign /></div>
-              <div className="stat-info"><h3>Total Revenue</h3><p>₹{stats.revenue.toLocaleString()}</p></div>
+          <div className="overview-tab fade-in">
+            <div className="stats-grid">
+              <div className="stat-card glass">
+                <div className="stat-icon-box" style={{ background: '#e0f2fe' }}><DollarSign size={20} color="#0ea5e9" /></div>
+                <div className="stat-content">
+                  <span className="stat-label">Total Revenue</span>
+                  <p className="stat-value">₹{stats.revenue.toLocaleString()}</p>
+                </div>
+              </div>
+              <div className="stat-card glass">
+                <div className="stat-icon-box" style={{ background: '#fff7ed' }}><ShoppingBag size={20} color="#f97316" /></div>
+                <div className="stat-content">
+                  <span className="stat-label">Total Orders</span>
+                  <p className="stat-value">{stats.totalOrders}</p>
+                </div>
+              </div>
+              <div className="stat-card glass">
+                <div className="stat-icon-box" style={{ background: '#f0fdf4' }}><Package size={20} color="#22c55e" /></div>
+                <div className="stat-content">
+                  <span className="stat-label">Total Products</span>
+                  <p className="stat-value">{stats.totalProducts}</p>
+                </div>
+              </div>
+              <div className="stat-card glass">
+                <div className="stat-icon-box" style={{ background: '#f5f3ff' }}><Users size={20} color="#8b5cf6" /></div>
+                <div className="stat-content">
+                  <span className="stat-label">Active Users</span>
+                  <p className="stat-value">{stats.totalUsers}</p>
+                </div>
+              </div>
             </div>
-            <div className="stat-card glass">
-              <div className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}><ShoppingBag /></div>
-              <div className="stat-info"><h3>Total Orders</h3><p>{stats.totalOrders}</p></div>
+
+            <div className="recent-activity-row">
+              <div className="activity-card glass">
+                <div className="card-top">
+                  <h3>Recent Orders</h3>
+                  <button className="view-all-link" onClick={() => setActiveTab('orders')}>View All</button>
+                </div>
+                <div className="mini-table-container">
+                  <table className="mini-table">
+                    <thead><tr><th>ORDER ID</th><th>TOTAL</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                      {orders.slice(0, 5).map(order => (
+                        <tr key={order._id}>
+                          <td>#{order._id.substring(0, 8)}</td>
+                          <td>₹{order.totalPrice}</td>
+                          <td><span className="status-pill-small">Paid</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {orders.length === 0 && <div className="empty-state">No orders yet</div>}
+                </div>
+              </div>
+
+              <div className="activity-card glass">
+                <div className="card-top">
+                  <h3>Recent Customers</h3>
+                  <button className="view-all-link" onClick={() => setActiveTab('customers')}>View All</button>
+                </div>
+                <div className="mini-table-container">
+                  <table className="mini-table">
+                    <thead><tr><th>NAME</th><th>ROLE</th></tr></thead>
+                    <tbody>
+                      {users.slice(0, 5).map(user => (
+                        <tr key={user._id}>
+                          <td>{user.name}</td>
+                          <td><span className="role-label">{user.isAdmin ? 'Admin' : 'User'}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {users.length === 0 && <div className="empty-state">No users yet</div>}
+                </div>
+              </div>
             </div>
-            <div className="stat-card glass">
-              <div className="stat-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><Package /></div>
-              <div className="stat-info"><h3>Total Products</h3><p>{stats.totalProducts}</p></div>
+          </div>
+        )}
+
+        {activeTab === 'products' && (
+          <div className="admin-content-card glass fade-in">
+            <div className="card-header">
+              <h2>Inventory</h2>
+              <button className="btn-primary" onClick={() => openModal()}><Plus size={18} /> New Product</button>
             </div>
-            <div className="stat-card glass">
-              <div className="stat-icon" style={{ background: '#f3e8ff', color: '#9333ea' }}><Users /></div>
-              <div className="stat-info"><h3>Active Users</h3><p>{stats.totalUsers}</p></div>
+            <div className="admin-table-wrapper">
+              <table className="pro-table">
+                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+                <tbody>
+                  {filteredProducts.map(product => (
+                    <tr key={product._id}>
+                      <td><div className="table-product-info"><img src={product.image} /><span>{product.name}</span></div></td>
+                      <td><span className="cat-badge">{product.category}</span></td>
+                      <td className="bold-text">₹{product.price}</td>
+                      <td>{product.countInStock} units</td>
+                      <td>
+                        <div className="pro-actions">
+                          <button className="p-edit-btn" onClick={() => openModal(product)}><Edit size={16} /></button>
+                          <button className="p-delete-btn" onClick={() => deleteHandler(product._id)}><Trash2 size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
+        )}
+
+        {loading && (
+          <div className="loading-overlay">
+            <div className="loader"></div>
           </div>
         )}
 

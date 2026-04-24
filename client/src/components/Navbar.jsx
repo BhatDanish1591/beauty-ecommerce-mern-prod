@@ -74,12 +74,8 @@ const Navbar = () => {
         </Link>
 
         <div className="nav-links">
-          {!userInfo && (
-            <>
-              <Link to="/" onClick={handleHomeClick}>Home</Link>
-              <Link to="/products">Collections</Link>
-            </>
-          )}
+          <Link to="/" onClick={handleHomeClick}>Home</Link>
+          <Link to="/products">Collections</Link>
           {userInfo?.isAdmin && <Link to="/admin">Admin</Link>}
         </div>
 

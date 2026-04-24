@@ -1,3 +1,4 @@
+const express = require('express');
 const { authUser, registerUser, getUserProfile, updateUserProfile, getUsers } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
 

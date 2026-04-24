@@ -67,7 +67,7 @@ const createProduct = async (req, res) => {
         const createdProduct = await product.save();
         res.status(201).json(createdProduct);
     } catch (error) {
-        res.status(400).json({ message: 'Invalid product data' });
+        res.status(400).json({ message: error.message || 'Invalid product data' });
     }
 };
 
