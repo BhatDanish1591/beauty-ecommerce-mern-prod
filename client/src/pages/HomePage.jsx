@@ -114,7 +114,7 @@ const HomePage = () => {
 
       {/* Luxury Best Sellers Infinite Marquee */}
       <section className="best-sellers-marquee-section">
-        <div className="section-header container">
+        <div className="section-header container" style={{ textAlign: 'center', margin: '0 auto 50px' }}>
           <h2 className="section-title">Best Sellers</h2>
           <p>The most coveted beauty essentials of the season</p>
         </div>
