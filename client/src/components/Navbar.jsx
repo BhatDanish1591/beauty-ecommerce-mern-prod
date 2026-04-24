@@ -70,7 +70,7 @@ const Navbar = () => {
     <nav className="navbar glass">
       <div className="container nav-content">
         <Link to="/" className="logo" onClick={handleHomeClick}>
-          <h1>BEAUTY<span>STORE</span></h1>
+          <h1>AURORA<span>LUXE</span></h1>
         </Link>
 
         <div className="nav-links">
@@ -117,7 +117,7 @@ const Navbar = () => {
                   >
                     <div className="dropdown-user-info">
                       <p className="d-name">{userInfo.name}</p>
-                      <p className="d-email">{userInfo.email}</p>
+                      <div className="c-item"><Mail size={14} /> <span>hello@luminastudio.com</span></div>
                     </div>
                     <div className="dropdown-divider"></div>
                     <Link to="/products" onClick={() => setShowDropdown(false)} className="dropdown-item">

@@ -29,14 +29,14 @@ const Footer = () => {
         <div className="container main-grid">
           <div className="brand-column">
             <div className="footer-logo-premium">
-              <h1>BEAUTY<span>STORE</span></h1>
+              <h1>AURORA<span>LUXE</span></h1>
             </div>
             <p className="brand-bio">
               Empowering your beauty ritual with the world's most sophisticated collections.
             </p>
             <div className="contact-mini">
               <div className="c-item"><MapPin size={14} /> <span>Mumbai, India</span></div>
-              <div className="c-item"><Mail size={14} /> <span>hello@beautystore.com</span></div>
+              <div className="c-item"><Mail size={14} /> <span>hello@auroraluxe.com</span></div>
             </div>
           </div>
 
@@ -69,7 +69,7 @@ const Footer = () => {
       <div className="footer-bottom-premium">
         <div className="container bottom-flex">
           <div className="copyright">
-            <p>&copy; 2026 BEAUTYSTORE GLOBAL.</p>
+            <p>&copy; 2026 AURORA LUXE GLOBAL.</p>
           </div>
           <div className="danish-badge">
             <span className="developed-by">Developed by</span>
