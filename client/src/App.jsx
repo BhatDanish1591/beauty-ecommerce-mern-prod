@@ -7,6 +7,7 @@ import ProductPage from './pages/ProductPage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import CheckoutPage from './pages/CheckoutPage';
 import ScrollToTop from './components/ScrollToTop';
@@ -27,6 +28,7 @@ const AppContent = () => {
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>

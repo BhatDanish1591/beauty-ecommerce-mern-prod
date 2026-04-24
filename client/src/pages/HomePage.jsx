@@ -17,8 +17,14 @@ const HomePage = () => {
     }
 
     const fetchProducts = async () => {
-      const { data } = await api.get('/products');
-      setProducts(data);
+      try {
+        const { data } = await api.get('/products');
+        if (Array.isArray(data)) {
+          setProducts(data);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
     };
     fetchProducts();
   }, [navigate]);

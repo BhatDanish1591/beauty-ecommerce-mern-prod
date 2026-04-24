@@ -53,8 +53,10 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const { data } = await api.get('/products');
-        setProducts(data);
-        setStats(prev => ({ ...prev, totalProducts: data.length }));
+        if (Array.isArray(data)) {
+          setProducts(data);
+          setStats(prev => ({ ...prev, totalProducts: data.length }));
+        }
       } catch (error) {
         console.error('Error fetching data');
       }
