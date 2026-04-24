@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../api';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, ShoppingBag, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Star, ShoppingBag, Quote, ChevronLeft, ChevronRight, Truck, ShieldCheck, Clock, Camera } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
@@ -83,6 +83,17 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Brand Section */}
+      <section className="brands-section">
+        <div className="container">
+          <div className="brands-track">
+            {['M.A.C', 'Estée Lauder', 'Clinique', 'Bobbi Brown', 'LANEIGE', 'The Face Shop'].map(brand => (
+              <div key={brand} className="brand-item">{brand}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Category Section */}
       <section className="categories container">
         <div className="section-header">
@@ -161,6 +172,27 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Why Choose Us */}
+      <section className="features-section container">
+        <div className="feature-grid">
+          <div className="feature-item glass">
+            <div className="feat-icon"><Truck size={32} /></div>
+            <h3>Free Shipping</h3>
+            <p>On all orders above ₹999</p>
+          </div>
+          <div className="feature-item glass">
+            <div className="feat-icon"><ShieldCheck size={32} /></div>
+            <h3>100% Authentic</h3>
+            <p>Sourced directly from brands</p>
+          </div>
+          <div className="feature-item glass">
+            <div className="feat-icon"><Clock size={32} /></div>
+            <h3>24/7 Support</h3>
+            <p>Dedicated beauty assistants</p>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section className="testimonials">
         <div className="container">
@@ -192,6 +224,31 @@ const HomePage = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Beauty Tips Section */}
+      <section className="beauty-tips container">
+        <div className="section-header">
+          <h2 className="section-title">Beauty Advice</h2>
+          <p>Expert tips for your daily beauty ritual</p>
+        </div>
+        <div className="tips-grid">
+          {[
+            { tag: 'Skincare', title: 'How to Layer Your Serums Like a Pro', img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800' },
+            { tag: 'Makeup', title: 'The Secret to a Flawless Base', img: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=800' },
+            { tag: 'Fragrance', title: 'Finding Your Signature Scent', img: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=800' }
+          ].map((tip, i) => (
+            <motion.div key={i} className="tip-card glass" whileHover={{ y: -10 }}>
+              <div className="tip-img-wrap"><img src={tip.img} alt={tip.title} /></div>
+              <div className="tip-content">
+                <span className="tip-tag">{tip.tag}</span>
+                <h3>{tip.title}</h3>
+                <p>Maximize the benefits of your beauty routine with expert guidance from our specialists.</p>
+                <button className="read-more">Read More <ArrowRight size={14}/></button>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 

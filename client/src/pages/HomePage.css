@@ -293,3 +293,168 @@
   .promo-form { flex-direction: column; }
   .promo-form input { width: 100%; }
 }
+
+/* Brands Section */
+.brands-section {
+  padding: 60px 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.brands-track {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.brand-item {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ddd;
+  letter-spacing: 3px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.brand-item:hover {
+  color: #1e293b;
+  transform: scale(1.1);
+}
+
+/* Features Section */
+.features-section {
+  margin: 100px auto;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.feature-item {
+  padding: 50px 30px;
+  text-align: center;
+  border-radius: 40px;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.feat-icon {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 25px;
+  color: #ba909b;
+  box-shadow: 0 10px 25px rgba(186, 144, 155, 0.15);
+}
+
+.feature-item h3 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 12px;
+  font-size: 1.4rem;
+  color: #1e293b;
+}
+
+.feature-item p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Beauty Tips Section */
+.beauty-tips {
+  margin: 120px auto;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.tip-card {
+  border-radius: 40px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.tip-img-wrap {
+  height: 280px;
+  overflow: hidden;
+}
+
+.tip-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.tip-card:hover .tip-img-wrap img {
+  transform: scale(1.1) rotate(2deg);
+}
+
+.tip-content {
+  padding: 35px;
+}
+
+.tip-tag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #fdf2f2;
+  color: #ba909b;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.tip-card h3 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  margin-bottom: 15px;
+  font-family: 'Playfair Display', serif;
+  color: #1e293b;
+}
+
+.tip-card p {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 25px;
+}
+
+.read-more {
+  background: none;
+  border: none;
+  color: #ba909b;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 1024px) {
+  .feature-grid, .tips-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .feature-grid, .tips-grid { grid-template-columns: 1fr; }
+  .brands-track { gap: 20px; }
+  .brand-item { font-size: 1.3rem; }
+}
