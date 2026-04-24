@@ -273,49 +273,129 @@
 .admin-modal {
   background: white;
   width: 100%;
-  max-width: 600px;
+  max-width: 550px;
   border-radius: 30px;
-  padding: 40px;
+  padding: 30px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 15px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #475569;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .form-group input, .form-group select, .form-group textarea {
-  padding: 12px 15px;
+  padding: 10px 15px;
   border-radius: 12px;
+  background: #f8fafc;
   border: 1px solid #e2e8f0;
-  font-weight: 500;
+  font-family: inherit;
+  font-size: 0.85rem;
   transition: all 0.3s ease;
   outline: none;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: #ba909b;
+  background: white;
+}
+
+.modal-submit {
+  margin-top: 10px;
+  padding: 14px !important;
+}
+
+/* Delete Modal */
+.delete-modal {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 25px;
+  padding: 35px;
+  text-align: center;
+}
+
+.delete-icon-box {
+  width: 70px;
+  height: 70px;
+  background: #fef2f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.delete-modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+.delete-modal p {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .form-group input:focus {

@@ -38,6 +38,8 @@ const AdminDashboard = () => {
     name: '', price: 0, image: '', brand: '', category: 'Makeup', countInStock: 0, description: ''
   });
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -77,15 +79,19 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  const deleteHandler = async (id) => {
-    if (window.confirm('Delete this product?')) {
-      try {
-        const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-        await api.delete(`/products/${id}`, config);
-        setProducts(products.filter(p => p._id !== id));
-      } catch (error) {
-        alert('Error deleting product');
-      }
+  const openDeleteModal = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteHandler = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      await api.delete(`/products/${productToDelete._id}`, config);
+      setProducts(products.filter(p => p._id !== productToDelete._id));
+      setShowDeleteModal(false);
+    } catch (error) {
+      alert('Error deleting product');
     }
   };
 
@@ -243,46 +249,13 @@ const AdminDashboard = () => {
           <div className="admin-content-card glass fade-in">
             <div className="card-header">
               <h2>Inventory</h2>
-              <button className="btn-primary" onClick={() => openModal()}><Plus size={18} /> New Product</button>
-            </div>
-            <div className="admin-table-wrapper">
-              <table className="pro-table">
-                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
-                <tbody>
-                  {filteredProducts.map(product => (
-                    <tr key={product._id}>
-                      <td><div className="table-product-info"><img src={product.image} /><span>{product.name}</span></div></td>
-                      <td><span className="cat-badge">{product.category}</span></td>
-                      <td className="bold-text">₹{product.price}</td>
-                      <td>{product.countInStock} units</td>
-                      <td>
-                        <div className="pro-actions">
-                          <button className="p-edit-btn" onClick={() => openModal(product)}><Edit size={16} /></button>
-                          <button className="p-delete-btn" onClick={() => deleteHandler(product._id)}><Trash2 size={16} /></button>
-                        </div>
-                      </td>
-                    </tr>
+              <div className="header-right">
+                <div className="table-filters">
+                  {['All', 'Makeup', 'Skincare', 'Fragrance', 'Tools'].map(f => (
+                    <button key={f} className={activeFilter === f ? 'filter-pill active' : 'filter-pill'} onClick={() => setActiveFilter(f)}>{f}</button>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {loading && (
-          <div className="loading-overlay">
-            <div className="loader"></div>
-          </div>
-        )}
-
-        {activeTab === 'products' && (
-          <div className="admin-content-card glass fade-in">
-            <div className="card-header">
-              <h2>Inventory</h2>
-              <div className="table-filters">
-                {['All', 'Makeup', 'Skincare', 'Fragrance', 'Tools'].map(f => (
-                  <button key={f} className={activeFilter === f ? 'filter-pill active' : 'filter-pill'} onClick={() => setActiveFilter(f)}>{f}</button>
-                ))}
+                </div>
+                <button className="btn-primary" onClick={() => openModal()}><Plus size={18} /> New Product</button>
               </div>
             </div>
             <div className="admin-table-wrapper">
@@ -298,7 +271,7 @@ const AdminDashboard = () => {
                       <td>
                         <div className="pro-actions">
                           <button className="p-edit-btn" onClick={() => openModal(product)}><Edit size={16} /></button>
-                          <button className="p-delete-btn" onClick={() => deleteHandler(product._id)}><Trash2 size={16} /></button>
+                          <button className="p-delete-btn" onClick={() => openDeleteModal(product)}><Trash2 size={16} /></button>
                         </div>
                       </td>
                     </tr>
@@ -384,6 +357,20 @@ const AdminDashboard = () => {
               <div className="form-group"><label>Description</label><textarea rows="3" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required></textarea></div>
               <button type="submit" className="btn-primary modal-submit">{editMode ? 'Update Product' : 'Create Product'}</button>
             </form>
+          </motion.div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <motion.div className="delete-modal glass" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+            <div className="delete-icon-box"><Trash2 size={32} color="#ef4444" /></div>
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete <strong>{productToDelete?.name}</strong>? This action cannot be undone.</p>
+            <div className="delete-modal-actions">
+              <button className="btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="btn-danger" onClick={confirmDeleteHandler}>Delete Product</button>
+            </div>
           </motion.div>
         </div>
       )}
