@@ -186,27 +186,7 @@ const ProductsPage = () => {
 
       {/* Main Dashboard Content */}
       <main className="dashboard-main">
-        {userInfo && (
-          <section className="dashboard-welcome glass">
-            <div className="welcome-text">
-              <h2>Welcome back, <span>{userInfo?.name}</span>!</h2>
-              <p>We've curated some new beauty essentials just for you. Explore our latest arrivals below.</p>
-              <div className="dashboard-stats">
-                <div className="dash-stat">
-                  <span className="stat-value">₹4,250</span>
-                  <span className="stat-label">Spent this month</span>
-                </div>
-                <div className="dash-stat">
-                  <span className="stat-value">{orders.length}</span>
-                  <span className="stat-label">Total Orders</span>
-                </div>
-              </div>
-            </div>
-            <motion.div className="welcome-image" animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-              <img src="/images/hero.png" alt="Beauty" />
-            </motion.div>
-          </section>
-        )}
+
 
         <AnimatePresence mode="wait">
           {activeTab === 'collections' && (
