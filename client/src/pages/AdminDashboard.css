@@ -692,3 +692,51 @@
   border-color: #ba909b;
   color: white;
 }
+
+.status-pill.info {
+  background: #e0f2fe;
+  color: #0ea5e9;
+}
+
+.status-pill.warning {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.order-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.status-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.status-btn.ship {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.status-btn.ship:hover {
+  background: #e0f2fe;
+}
+
+.status-btn.deliver {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.status-btn.deliver:hover {
+  background: #dcfce7;
+}

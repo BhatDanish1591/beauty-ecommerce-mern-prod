@@ -52,4 +52,41 @@ const getOrders = async (req, res) => {
     res.json(orders);
 };
 
-module.exports = { addOrderItems, getMyOrders, getOrderById, getOrders };
+// @desc    Update order to shipped
+// @route   PUT /api/orders/:id/ship
+// @access  Private/Admin
+const updateOrderToShipped = async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+        order.isShipped = true;
+        order.shippedAt = Date.now();
+        const updatedOrder = await order.save();
+        res.json(updatedOrder);
+    } else {
+        res.status(404).json({ message: 'Order not found' });
+    }
+};
+
+// @desc    Update order to delivered
+// @route   PUT /api/orders/:id/deliver
+// @access  Private/Admin
+const updateOrderToDelivered = async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+        const updatedOrder = await order.save();
+        res.json(updatedOrder);
+    } else {
+        res.status(404).json({ message: 'Order not found' });
+    }
+};
+
+module.exports = { 
+    addOrderItems, 
+    getMyOrders, 
+    getOrderById, 
+    getOrders,
+    updateOrderToShipped,
+    updateOrderToDelivered
+};

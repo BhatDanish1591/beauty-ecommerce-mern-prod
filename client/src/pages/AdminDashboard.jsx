@@ -99,6 +99,17 @@ const AdminDashboard = () => {
     }
   };
 
+  const updateOrderStatus = async (id, type) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      const endpoint = type === 'ship' ? `/orders/${id}/ship` : `/orders/${id}/deliver`;
+      const { data } = await api.put(endpoint, {}, config);
+      setOrders(orders.map(o => o._id === id ? data : o));
+    } catch (error) {
+      alert('Error updating order status');
+    }
+  };
+
   const openModal = (product = null) => {
     if (product) {
       setEditMode(true);
@@ -341,7 +352,27 @@ const AdminDashboard = () => {
                       </td>
                       <td className="bold-text">₹{order.totalPrice}</td>
                       <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                      <td><span className="status-pill success">Paid</span></td>
+                      <td>
+                        <div className="status-cell">
+                          {order.isDelivered ? (
+                            <span className="status-pill success">Delivered</span>
+                          ) : order.isShipped ? (
+                            <span className="status-pill info">Shipped</span>
+                          ) : (
+                            <span className="status-pill warning">Processing</span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="order-actions">
+                          {!order.isShipped && (
+                            <button className="status-btn ship" onClick={() => updateOrderStatus(order._id, 'ship')}>Mark Shipped</button>
+                          )}
+                          {order.isShipped && !order.isDelivered && (
+                            <button className="status-btn deliver" onClick={() => updateOrderStatus(order._id, 'deliver')}>Mark Delivered</button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
