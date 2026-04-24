@@ -83,16 +83,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Brand Section */}
-      <section className="brands-section">
-        <div className="container">
-          <div className="brands-track">
-            {['M.A.C', 'Estée Lauder', 'Clinique', 'Bobbi Brown', 'LANEIGE', 'The Face Shop'].map(brand => (
-              <div key={brand} className="brand-item">{brand}</div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* Category Section */}
       <section className="categories container">
