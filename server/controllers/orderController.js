@@ -44,4 +44,12 @@ const getOrderById = async (req, res) => {
     }
 };
 
-module.exports = { addOrderItems, getMyOrders, getOrderById };
+// @desc    Get all orders
+// @route   GET /api/orders
+// @access  Private/Admin
+const getOrders = async (req, res) => {
+    const orders = await Order.find({}).populate('user', 'id name email').sort({ createdAt: -1 });
+    res.json(orders);
+};
+
+module.exports = { addOrderItems, getMyOrders, getOrderById, getOrders };

@@ -19,28 +19,23 @@ import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('overview');
   const [activeFilter, setActiveFilter] = useState('All');
   const [stats, setStats] = useState({
     totalProducts: 0,
-    totalUsers: 154,
-    totalOrders: 42,
-    revenue: 125400
+    totalUsers: 0,
+    totalOrders: 0,
+    revenue: 0
   });
 
-  // Modal State
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    price: 0,
-    image: '',
-    brand: '',
-    category: 'Makeup',
-    countInStock: 0,
-    description: ''
+    name: '', price: 0, image: '', brand: '', category: 'Makeup', countInStock: 0, description: ''
   });
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -52,24 +47,36 @@ const AdminDashboard = () => {
 
     const fetchData = async () => {
       try {
-        const { data } = await api.get('/products');
-        if (Array.isArray(data)) {
-          setProducts(data);
-          setStats(prev => ({ ...prev, totalProducts: data.length }));
-        }
+        const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+        const [prodRes, orderRes, userRes] = await Promise.all([
+          api.get('/products'),
+          api.get('/orders', config),
+          api.get('/users', config)
+        ]);
+
+        if (Array.isArray(prodRes.data)) setProducts(prodRes.data);
+        if (Array.isArray(orderRes.data)) setOrders(orderRes.data);
+        if (Array.isArray(userRes.data)) setUsers(userRes.data);
+
+        const totalRevenue = orderRes.data.reduce((acc, order) => acc + order.totalPrice, 0);
+        
+        setStats({
+          totalProducts: prodRes.data.length,
+          totalOrders: orderRes.data.length,
+          totalUsers: userRes.data.length,
+          revenue: totalRevenue
+        });
       } catch (error) {
-        console.error('Error fetching data');
+        console.error('Error fetching admin data');
       }
     };
     fetchData();
   }, []);
 
   const deleteHandler = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+    if (window.confirm('Delete this product?')) {
       try {
-        const config = {
-          headers: { Authorization: `Bearer ${userInfo.token}` }
-        };
+        const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
         await api.delete(`/products/${id}`, config);
         setProducts(products.filter(p => p._id !== id));
       } catch (error) {
@@ -82,25 +89,11 @@ const AdminDashboard = () => {
     if (product) {
       setEditMode(true);
       setCurrentId(product._id);
-      setFormData({
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        brand: product.brand,
-        category: product.category,
-        countInStock: product.countInStock,
-        description: product.description
-      });
+      setFormData({ ...product });
     } else {
       setEditMode(false);
       setFormData({
-        name: '',
-        price: 0,
-        image: '/images/product-01.jpg',
-        brand: 'Rare Beauty',
-        category: 'Makeup',
-        countInStock: 10,
-        description: ''
+        name: '', price: 0, image: '/images/product-01.jpg', brand: '', category: 'Makeup', countInStock: 10, description: ''
       });
     }
     setShowModal(true);
@@ -108,10 +101,7 @@ const AdminDashboard = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const config = {
-      headers: { Authorization: `Bearer ${userInfo.token}` }
-    };
-
+    const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
     try {
       if (editMode) {
         const { data } = await api.put(`/products/${currentId}`, formData, config);
@@ -126,119 +116,144 @@ const AdminDashboard = () => {
     }
   };
 
-  const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          p.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = activeFilter === 'All' || p.category === activeFilter;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredProducts = products.filter(p => 
+    (p.name.toLowerCase().includes(searchTerm.toLowerCase())) && 
+    (activeFilter === 'All' || p.category === activeFilter)
+  );
 
   return (
     <div className="admin-container">
-      {/* Sidebar */}
       <aside className="admin-sidebar glass">
         <div className="sidebar-brand">
           <LayoutDashboard size={24} color="var(--accent)" />
           <span>Admin<span>Panel</span></span>
         </div>
-        
         <nav className="sidebar-nav">
           <button className={activeTab === 'overview' ? 'active' : ''} onClick={() => setActiveTab('overview')}><TrendingUp size={20} /> Overview</button>
           <button className={activeTab === 'products' ? 'active' : ''} onClick={() => setActiveTab('products')}><Package size={20} /> Products</button>
           <button className={activeTab === 'orders' ? 'active' : ''} onClick={() => setActiveTab('orders')}><ShoppingBag size={20} /> Orders</button>
           <button className={activeTab === 'customers' ? 'active' : ''} onClick={() => setActiveTab('customers')}><Users size={20} /> Customers</button>
         </nav>
-
         <div className="sidebar-footer">
           <button onClick={() => { localStorage.removeItem('userInfo'); window.location.href = '/'; }}><LogOut size={20} /> Logout</button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="admin-main">
         <header className="admin-header">
-          <div className="header-info">
-            <h1 style={{ textTransform: 'capitalize' }}>{activeTab} Management</h1>
-          </div>
+          <h1 style={{ textTransform: 'capitalize' }}>{activeTab}</h1>
           <div className="header-actions">
             <div className="admin-search glass">
               <Search size={18} />
               <input type="text" placeholder={`Search ${activeTab}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
             {activeTab === 'products' && (
-              <button className="btn-primary add-product-btn" onClick={() => openModal()}>
-                <Plus size={18} /> New Product
-              </button>
+              <button className="btn-primary" onClick={() => openModal()}><Plus size={18} /> New Product</button>
             )}
           </div>
         </header>
 
-        {activeTab === 'products' && (
-          <section className="fade-in">
-            <div className="admin-content-card glass">
-              <div className="card-header">
-                <h2>Product Inventory</h2>
-                <div className="table-filters">
-                  {['All', 'Makeup', 'Skincare', 'Fragrance', 'Tools'].map(f => (
-                    <button key={f} className={activeFilter === f ? 'filter-pill active' : 'filter-pill'} onClick={() => setActiveFilter(f)}>{f}</button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="admin-table-wrapper">
-                <table className="pro-table">
-                  <thead>
-                    <tr>
-                      <th>Product</th>
-                      <th>Category</th>
-                      <th>Price</th>
-                      <th>Stock</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <AnimatePresence>
-                      {filteredProducts.map((product) => (
-                        <motion.tr key={product._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} layout>
-                          <td>
-                            <div className="table-product-info">
-                              <img src={product.image} alt={product.name} />
-                              <span>{product.name}</span>
-                            </div>
-                          </td>
-                          <td><span className="cat-badge">{product.category}</span></td>
-                          <td className="bold-text">₹{product.price}</td>
-                          <td>
-                            <div className="stock-status">
-                              <div className="stock-bar"><div className="stock-fill" style={{ width: `${(product.countInStock/50)*100}%` }}></div></div>
-                              <span>{product.countInStock} units</span>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="pro-actions">
-                              <button className="p-edit-btn" onClick={() => openModal(product)}><Edit size={16} /></button>
-                              <button className="p-delete-btn" onClick={() => deleteHandler(product._id)}><Trash2 size={16} /></button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </AnimatePresence>
-                  </tbody>
-                </table>
-              </div>
+        {activeTab === 'overview' && (
+          <div className="stats-grid fade-in">
+            <div className="stat-card glass">
+              <div className="stat-icon" style={{ background: '#e0f2fe', color: '#0ea5e9' }}><DollarSign /></div>
+              <div className="stat-info"><h3>Total Revenue</h3><p>₹{stats.revenue.toLocaleString()}</p></div>
             </div>
-          </section>
+            <div className="stat-card glass">
+              <div className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}><ShoppingBag /></div>
+              <div className="stat-info"><h3>Total Orders</h3><p>{stats.totalOrders}</p></div>
+            </div>
+            <div className="stat-card glass">
+              <div className="stat-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><Package /></div>
+              <div className="stat-info"><h3>Total Products</h3><p>{stats.totalProducts}</p></div>
+            </div>
+            <div className="stat-card glass">
+              <div className="stat-icon" style={{ background: '#f3e8ff', color: '#9333ea' }}><Users /></div>
+              <div className="stat-info"><h3>Active Users</h3><p>{stats.totalUsers}</p></div>
+            </div>
+          </div>
         )}
 
-        {/* Other tabs placeholders */}
-        {activeTab !== 'products' && (
-           <section className="fade-in">
-             <div className="admin-content-card glass" style={{ padding: '60px', textAlign: 'center' }}>
-                <TrendingUp size={48} color="var(--accent)" style={{ marginBottom: '20px' }} />
-                <h2>{activeTab} Analytics</h2>
-                <p>Detailed management for {activeTab} will be available soon.</p>
-             </div>
-           </section>
+        {activeTab === 'products' && (
+          <div className="admin-content-card glass fade-in">
+            <div className="card-header">
+              <h2>Inventory</h2>
+              <div className="table-filters">
+                {['All', 'Makeup', 'Skincare', 'Fragrance', 'Tools'].map(f => (
+                  <button key={f} className={activeFilter === f ? 'filter-pill active' : 'filter-pill'} onClick={() => setActiveFilter(f)}>{f}</button>
+                ))}
+              </div>
+            </div>
+            <div className="admin-table-wrapper">
+              <table className="pro-table">
+                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+                <tbody>
+                  {filteredProducts.map(product => (
+                    <tr key={product._id}>
+                      <td><div className="table-product-info"><img src={product.image} /><span>{product.name}</span></div></td>
+                      <td><span className="cat-badge">{product.category}</span></td>
+                      <td className="bold-text">₹{product.price}</td>
+                      <td>{product.countInStock} units</td>
+                      <td>
+                        <div className="pro-actions">
+                          <button className="p-edit-btn" onClick={() => openModal(product)}><Edit size={16} /></button>
+                          <button className="p-delete-btn" onClick={() => deleteHandler(product._id)}><Trash2 size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <div className="admin-content-card glass fade-in">
+            <h2>Recent Orders</h2>
+            <div className="admin-table-wrapper">
+              <table className="pro-table">
+                <thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Date</th><th>Status</th></tr></thead>
+                <tbody>
+                  {orders.map(order => (
+                    <tr key={order._id}>
+                      <td className="bold-text">#{order._id.substring(0, 8)}</td>
+                      <td>
+                        <div className="order-user">
+                          <strong>{order.user?.name || 'Guest'}</strong>
+                          <span>{order.user?.email || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="bold-text">₹{order.totalPrice}</td>
+                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td><span className="status-pill success">Paid</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'customers' && (
+          <div className="admin-content-card glass fade-in">
+            <h2>Registered Customers</h2>
+            <div className="admin-table-wrapper">
+              <table className="pro-table">
+                <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+                <tbody>
+                  {users.map(user => (
+                    <tr key={user._id}>
+                      <td>{user._id}</td>
+                      <td className="bold-text">{user.name}</td>
+                      <td>{user.email}</td>
+                      <td><span className={user.isAdmin ? 'cat-badge admin' : 'cat-badge'}>{user.isAdmin ? 'Admin' : 'Customer'}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </main>
 
@@ -252,42 +267,21 @@ const AdminDashboard = () => {
             </div>
             <form onSubmit={submitHandler} className="modal-form">
               <div className="form-row">
-                <div className="form-group">
-                  <label>Product Name</label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
-                </div>
-                <div className="form-group">
-                  <label>Price (₹)</label>
-                  <input type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} required />
-                </div>
+                <div className="form-group"><label>Product Name</label><input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required /></div>
+                <div className="form-group"><label>Price (₹)</label><input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required /></div>
               </div>
               <div className="form-row">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})}>
+                <div className="form-group"><label>Category</label>
+                  <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                     {['Makeup', 'Skincare', 'Fragrance', 'Tools'].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Stock Count</label>
-                  <input type="number" value={formData.countInStock} onChange={(e) => setFormData({...formData, countInStock: e.target.value})} required />
-                </div>
+                <div className="form-group"><label>Stock Count</label><input type="number" value={formData.countInStock} onChange={e => setFormData({...formData, countInStock: e.target.value})} required /></div>
               </div>
-              <div className="form-group">
-                <label>Image URL (e.g. /images/product-01.jpg)</label>
-                <input type="text" value={formData.image} onChange={(e) => setFormData({...formData, image: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Brand</label>
-                <input type="text" value={formData.brand} onChange={(e) => setFormData({...formData, brand: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea rows="3" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} required></textarea>
-              </div>
-              <button type="submit" className="btn-primary modal-submit">
-                {editMode ? 'Update Product' : 'Create Product'}
-              </button>
+              <div className="form-group"><label>Image URL</label><input type="text" value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} required /></div>
+              <div className="form-group"><label>Brand</label><input type="text" value={formData.brand} onChange={e => setFormData({...formData, brand: e.target.value})} required /></div>
+              <div className="form-group"><label>Description</label><textarea rows="3" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required></textarea></div>
+              <button type="submit" className="btn-primary modal-submit">{editMode ? 'Update Product' : 'Create Product'}</button>
             </form>
           </motion.div>
         </div>
