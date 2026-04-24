@@ -264,7 +264,19 @@ const ProductsPage = () => {
                   {orders.length === 0 ? <div style={{ textAlign: 'center', padding: '40px' }}><ShoppingBag size={48} color="#64748b" style={{ marginBottom: '20px' }} /><h3>No orders yet</h3></div> : orders.map(order => (
                     <div key={order._id} className="order-item-pro glass" onClick={() => setSelectedOrder(order)} style={{ padding: '20px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
                       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}><div className="order-icon-wrap" style={{ background: 'var(--primary)', padding: '15px', borderRadius: '15px' }}><Package color="white" /></div><div><h4 style={{ marginBottom: '5px' }}>Order #{order._id.substring(18).toUpperCase()}</h4><p style={{ fontSize: '0.85rem', color: '#64748b' }}>Placed on {new Date(order.createdAt).toLocaleDateString()}</p></div></div>
-                      <div style={{ textAlign: 'right' }}><p style={{ fontWeight: 800, fontSize: '1.1rem' }}>₹{order.totalPrice}</p><span className="status-pill-pro" style={{ background: order.isShipped ? '#dcfce7' : '#fef9c3', color: order.isShipped ? '#166534' : '#854d0e', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>{order.isShipped ? 'Shipped' : 'Processing'}</span></div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontWeight: 800, fontSize: '1.1rem' }}>₹{order.totalPrice}</p>
+                        <span className="status-pill-pro" style={{ 
+                          background: order.isDelivered ? '#dcfce7' : order.isShipped ? '#e0f2fe' : '#fef9c3', 
+                          color: order.isDelivered ? '#166534' : order.isShipped ? '#0369a1' : '#854d0e', 
+                          padding: '4px 12px', 
+                          borderRadius: '20px', 
+                          fontSize: '0.8rem', 
+                          fontWeight: 700 
+                        }}>
+                          {order.isDelivered ? 'Delivered' : order.isShipped ? 'Shipped' : 'Processing'}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </motion.div>
@@ -285,7 +297,7 @@ const ProductsPage = () => {
 
       {/* Modal - only if logged in */}
       {userInfo && selectedOrder && (
-        <div className="modal-overlay"><motion.div className="admin-modal glass" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}><div className="modal-header"><h2>Order Details</h2><button className="close-btn" onClick={() => setSelectedOrder(null)}><X size={24} /></button></div><div className="order-modal-content"><div className="order-status-banner glass" style={{ display: 'flex', gap: '20px', padding: '20px', borderRadius: '20px', marginBottom: '30px', background: 'rgba(255, 209, 220, 0.2)' }}><div className="status-icon-wrap" style={{ background: 'var(--primary)', padding: '15px', borderRadius: '15px' }}><Truck color="white" /></div><div><h4 style={{ color: 'var(--dark)' }}>Order #{selectedOrder._id.toUpperCase()}</h4><p style={{ fontWeight: 600, color: 'var(--accent)' }}>Status: {selectedOrder.isShipped ? 'Shipped' : 'Processing'}</p></div></div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}><div className="detail-box"><h4 style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} /> Delivery Address</h4><div className="glass" style={{ padding: '15px', borderRadius: '15px', fontSize: '0.9rem' }}><p><strong>{selectedOrder.shippingAddress.name}</strong></p><p>{selectedOrder.shippingAddress.address}</p></div></div><div className="detail-box"><h4 style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><CreditCard size={16} /> Payment Info</h4><div className="glass" style={{ padding: '15px', borderRadius: '15px', fontSize: '0.9rem' }}><p>Amount: ₹{selectedOrder.totalPrice}</p></div></div></div></div></motion.div></div>
+        <div className="modal-overlay"><motion.div className="admin-modal glass" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}><div className="modal-header"><h2>Order Details</h2><button className="close-btn" onClick={() => setSelectedOrder(null)}><X size={24} /></button></div><div className="order-modal-content"><div className="order-status-banner glass" style={{ display: 'flex', gap: '20px', padding: '20px', borderRadius: '20px', marginBottom: '30px', background: 'rgba(255, 209, 220, 0.2)' }}><div className="status-icon-wrap" style={{ background: 'var(--primary)', padding: '15px', borderRadius: '15px' }}><Truck color="white" /></div><div><h4 style={{ color: 'var(--dark)' }}>Order #{selectedOrder._id.toUpperCase()}</h4><p style={{ fontWeight: 600, color: 'var(--accent)' }}>Status: {selectedOrder.isDelivered ? 'Delivered' : selectedOrder.isShipped ? 'Shipped' : 'Processing'}</p></div></div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}><div className="detail-box"><h4 style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} /> Delivery Address</h4><div className="glass" style={{ padding: '15px', borderRadius: '15px', fontSize: '0.9rem' }}><p><strong>{selectedOrder.shippingAddress.name}</strong></p><p>{selectedOrder.shippingAddress.address}</p></div></div><div className="detail-box"><h4 style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><CreditCard size={16} /> Payment Info</h4><div className="glass" style={{ padding: '15px', borderRadius: '15px', fontSize: '0.9rem' }}><p>Amount: ₹{selectedOrder.totalPrice}</p></div></div></div></div></motion.div></div>
       )}
     </div>
   );
