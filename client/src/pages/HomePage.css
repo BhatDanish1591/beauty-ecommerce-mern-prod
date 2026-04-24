@@ -1,4 +1,5 @@
 .homepage {
+  background: linear-gradient(135deg, #fffdf7 0%, #fff5f8 100%);
   padding-bottom: 80px;
 }
 
@@ -60,7 +61,6 @@
 
 /* Best Sellers Slider Section */
 .best-sellers-slider-section {
-  background: #fff;
   padding: 100px 0;
   margin: 80px 0;
 }
@@ -112,11 +112,12 @@
 }
 
 .premium-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  border: 1px solid rgba(255,255,255,0.5);
 }
 
 .card-image-wrapper {
