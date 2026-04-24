@@ -597,4 +597,35 @@
   100% { transform: rotate(360deg); }
 }
 
+.table-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-pill {
+  padding: 6px 15px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.filter-pill:hover {
+  background: #e2e8f0;
+}
+
+.filter-pill.active {
+  background: #ba909b;
+  color: white;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 
